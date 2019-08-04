@@ -1,0 +1,99 @@
+{%- assign container_aspect_ratio = width | times: 1.0 | divided_by: height -%}
+{% if media.aspect_ratio %}
+  {%- assign media_aspect_ratio = media.aspect_ratio -%}
+  {%- assign media_height = media.height -%}
+  {%- assign media_width = media.width -%}
+{% elsif media.media_type == "video" %}
+  {%- assign media_height = 0 -%}
+  {% for source in media.sources %}
+    {% if media_height < source.height %}
+      {%- assign media_height = source.height -%}
+      {%- assign media_width = source.width -%}
+      {%- assign media_aspect_ratio = media_width | times: 1.0 | divided_by: media_height -%}
+    {% endif %}
+  {% endfor %}
+{% elsif media.media_type == "model" %}
+    {% comment %} Hack until 3D models have model based Preview Image {% endcomment %}
+    {%- assign media_height = 530 -%}
+    {%- assign media_width = 530 -%}
+    {%- assign media_aspect_ratio = 1 -%}
+{% else %}
+    {%- assign media_height = media.preview_image.height -%}
+    {%- assign media_width = media.preview_image.width -%}
+    {%- assign media_aspect_ratio = media.preview_image.aspect_ratio -%}
+{% endif %}
+<style>
+  {% if media_aspect_ratio < 1.0 %}
+    {% assign maximum_width = height | times: media_aspect_ratio %}
+    {% if media_height <= height %}
+      {% assign maximum_height = media_height %}
+      {% assign maximum_width = media_width %}
+    {% else %}
+      {% assign maximum_height = height %}
+    {% endif %}
+  {% elsif media_aspect_ratio < container_aspect_ratio %}
+    {% assign maximum_height = height | divided_by: media_aspect_ratio %}
+    {% if media_height <= height %}
+      {% assign maximum_height = media_height %}
+      {% assign maximum_width = media_width %}
+    {% else %}
+      {% assign maximum_height = height %}
+      {% assign maximum_width = height | times: media_aspect_ratio %}
+    {% endif %}
+  {% else %}
+    {% assign maximum_height = height | divided_by: media_aspect_ratio %}
+    {% if media_width <= width %}
+      {% assign maximum_height = media_height %}
+      {% assign maximum_width = media_width %}
+    {% else %}
+      {% assign maximum_width = width %}
+      {% assign maximum_height = maximum_width | divided_by: media_aspect_ratio %}
+    {% endif %}
+  {% endif %}
+
+  {% if small_style %}@media screen and (min-width: 750px) { {% endif %}
+    #{{ media_id }} {
+      max-width: {{ maximum_width }}px;
+      max-height: {{ maximum_height }}px;
+    }
+    #{{ wrapper_id }} {
+      max-width: {{ maximum_width }}px;
+      max-height: {{ maximum_height }}px;
+    }
+  {% if small_style %} } {% endif %}
+
+  {% if small_style %}
+    {% if media_aspect_ratio < 1 %}
+      {% assign maximum_width = 750 | times: media_aspect_ratio %}
+    {% else %}
+      {% if media_width < 750 %}
+        {% assign maximum_width = media_width %}
+      {% else %}
+        {% assign maximum_width = 750 %}
+      {% endif %}
+    {% endif %}
+    @media screen and (max-width: 749px) {
+      #{{ media_id }} {
+        max-width: {{ maximum_width }}px;
+        max-height: 750px;
+      }
+      #{{ wrapper_id }} {
+        max-width: {{ maximum_width }}px;
+      }
+    }
+  {% endif %}
+  {% if media_aspect_ratio %}
+    #{{ named_media_id }}{
+      padding-top:{{ 1 | divided_by: media_aspect_ratio | times: 100}}%;
+    }
+    #{{ named_media_id }} .shopify-video-wrapper{
+      padding-top:{{ 1 | divided_by: media_aspect_ratio | times: 100}}%;
+    }
+  {% endif %}
+  {% if media.media_type == "model" %}
+    #{{ named_media_id }} .model-wrapper{
+      width: 100%;
+      height: {{ maximum_height }}px;
+    }
+  {% endif %}
+</style>

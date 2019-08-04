@@ -1,0 +1,11 @@
+{%- assign img_url = media | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+
+<img id="{{ media_id }}" data-match-url="{{ media | img_url: 'master' }}"
+        class="feature-row__image {{ media_class }} lazyload{% unless featured_media == media %} lazypreload{% endunless %}"
+        src="{{ media | img_url: '300x300' }}"
+        data-src="{{ img_url }}"
+        data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+        data-aspectratio="{{ media.aspect_ratio }}"
+        data-sizes="auto"
+        tabindex="-1"
+        alt="{{ media.alt | escape }}">

@@ -1,0 +1,31 @@
+<video playsinline="true" data-media-id="{{ media_id }}" class="video-player {{ media_class }}" poster="{{ media | img_url: '500x' }}" aria-label="{{ media.alt }}">
+  {% for source in media.sources %}
+    <source src="{{source.url}}" type={{source.mime_type}}>
+  {% endfor %}
+  Your browser does not support the video tag.
+</video>
+<div class="video-controls hidden-controls" data-media-id="{{ media_id }}">
+  <button type="button" class="play-pause" data-media-id="{{ media_id }}">
+    <div class="control-icon play-icon">{% include 'icon-play' %}</div>
+    <div class="control-icon pause-icon hide">{% include 'icon-pause' %}</div>
+  </button>
+  <div class="seek-wrapper" data-media-id="{{ media_id }}">
+    <input type="range" class="seek-bar" value="0" data-media-id="{{ media_id }}">
+  </div>
+  <button type="button" class="mute" data-media-id="{{ media_id }}">
+    <div class="control-icon mute-icon hide">{% include 'icon-mute' %}</div>
+    <div class="control-icon unmute-icon">{% include 'icon-unmute' %}</div>
+  </button>
+  <div class="volume-wrapper hidden-controls" data-media-id="{{ media_id }}">
+    <input type="range" class="volume-bar" value="1" min="0" max="1" step="0.01" data-media-id="{{ media_id }}">
+  </div>
+</div>
+<button type="button" class="pause-overlay" data-media-id="{{ media_id }}">
+  {% include 'icon-play' %}
+</button>
+<button class="flash-wrapper hidden-controls" data-media-id="{{ media_id }}">
+  {% include 'icon-mute' %}
+  {% include 'icon-unmute' %}
+  {% include 'icon-play' %}
+  {% include 'icon-pause' %}
+</button>
